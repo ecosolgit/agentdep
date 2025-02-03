@@ -17,7 +17,7 @@ If(-Not $installed) {
         Start-Process -NoNewWindow -FilePath $fusionUninstaller -ArgumentList "/S" -Wait
     }
 
-    Invoke-WebRequest -Uri "https://github.com/glpi-project/glpi-agent/releases/download/1.4/GLPI-Agent-1.4-x64.msi" -OutFile "$HOME\Downloads\glpi_agent.msi"
+    Invoke-WebRequest -Uri "https://github.com/glpi-project/glpi-agent/releases/download/1.12/GLPI-Agent-1.12-x64.msi" -OutFile "$HOME\Downloads\glpi_agent.msi"
 
     Write-Host "Installing..."
 
