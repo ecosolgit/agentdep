@@ -4,7 +4,7 @@ $admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 )
 
 if (-not $admin) {
-    # Télécharger le vrai script GLPI (tout ton script complet)
+    # Télécharger le script GLPI 
     $scriptContent = @'
 $fusionUninstaller = "C:\Program Files\FusionInventory-Agent\Uninstall.exe"
 
@@ -30,20 +30,12 @@ If(-Not $installed) {
     )
     Start-Process C:\Windows\System32\msiexec.exe -ArgumentList $arguments -wait
 }
-
 Write-Host "$software is installed."
-
 pause
 '@
-
-    # Encode en base64 pour -EncodedCommand
     $bytes = [System.Text.Encoding]::Unicode.GetBytes($scriptContent)
     $encoded = [Convert]::ToBase64String($bytes)
-
     # Relancer en mode admin avec le script encodé
     Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -EncodedCommand $encoded"
     exit
 }
-
-# Si déjà admin : on ne fait rien ici (tout est exécuté dans la relance encodée)
-Write-Host "Fenêtre admin active. Rien à faire ici."
