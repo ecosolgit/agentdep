@@ -1,11 +1,11 @@
-if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-    if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
-        $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
-        Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
-        Exit
-    }
-}
+# Vérifie si admin
+$admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+    [Security.Principal.WindowsBuiltInRole]::Administrator
+)
 
+if (-not $admin) {
+    # Télécharger le vrai script GLPI (tout ton script complet)
+    $scriptContent = @'
 $fusionUninstaller = "C:\Program Files\FusionInventory-Agent\Uninstall.exe"
 
 $software = "GLPI Agent"
@@ -34,3 +34,16 @@ If(-Not $installed) {
 Write-Host "$software is installed."
 
 pause
+'@
+
+    # Encode en base64 pour -EncodedCommand
+    $bytes = [System.Text.Encoding]::Unicode.GetBytes($scriptContent)
+    $encoded = [Convert]::ToBase64String($bytes)
+
+    # Relancer en mode admin avec le script encodé
+    Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -EncodedCommand $encoded"
+    exit
+}
+
+# Si déjà admin : on ne fait rien ici (tout est exécuté dans la relance encodée)
+Write-Host "Fenêtre admin active. Rien à faire ici."
